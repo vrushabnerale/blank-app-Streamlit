@@ -236,17 +236,36 @@ if 'combined_df' in locals() and 'filtered_df_part2' in locals():
     ]
     filtered_data = filtered_data[columns_to_keep]
 
-    # Add filter for Kreuzungspartner
+     # Add filter for Kreuzungspartner
     st.subheader("Filter Data by Kreuzungspartner")
     unique_kreuzungspartner = filtered_data['Kreuzungspartner'].unique()
+    default_kreuzungspartner = [unique_kreuzungspartner[0]] if len(unique_kreuzungspartner) > 0 else []
+
     selected_kreuzungspartner = st.multiselect(
         "Select Kreuzungspartner to filter:", 
         options=unique_kreuzungspartner, 
-        default=unique_kreuzungspartner
+        default=default_kreuzungspartner
     )
     
-    # Apply the filter
+    # Apply Kreuzungspartner filter
     filtered_data = filtered_data[filtered_data['Kreuzungspartner'].isin(selected_kreuzungspartner)]
+
+    # Reuse KW Start input from earlier
+    st.subheader("Filter Data Based on KW Start")
+    weeks_to_consider = st.number_input(
+        "How many weeks would you like to include from KW Start?",
+        min_value=1, 
+        max_value=52, 
+        value=10, 
+        step=1
+    )
+
+    # Calculate the KW range
+    kw_start_max = user_kw_start + weeks_to_consider - 1
+    filtered_data = filtered_data[
+        (filtered_data['KW Start'] >= user_kw_start) & 
+        (filtered_data['KW Start'] <= kw_start_max)
+    ]
 
     # Sort by KW Start in ascending order
     filtered_data = filtered_data.sort_values(by='KW Start', ascending=True)
