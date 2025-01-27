@@ -236,8 +236,23 @@ if 'combined_df' in locals() and 'filtered_df_part2' in locals():
     ]
     filtered_data = filtered_data[columns_to_keep]
 
-    # Display the merged data
-    st.subheader("Preview of the Final Merged Data")
+    # Add filter for Kreuzungspartner
+    st.subheader("Filter Data by Kreuzungspartner")
+    unique_kreuzungspartner = filtered_data['Kreuzungspartner'].unique()
+    selected_kreuzungspartner = st.multiselect(
+        "Select Kreuzungspartner to filter:", 
+        options=unique_kreuzungspartner, 
+        default=unique_kreuzungspartner
+    )
+    
+    # Apply the filter
+    filtered_data = filtered_data[filtered_data['Kreuzungspartner'].isin(selected_kreuzungspartner)]
+
+    # Sort by KW Start in ascending order
+    filtered_data = filtered_data.sort_values(by='KW Start', ascending=True)
+
+    # Display the filtered merged data
+    st.subheader("Preview of the Filtered Merged Data")
     st.dataframe(filtered_data)
 
     # Save the final output to a temporary file
